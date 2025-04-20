@@ -7,9 +7,9 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-soft-blue-50 flex flex-col justify-center items-center px-6 py-24 md:py-32">
+    <div className="min-h-screen bg-[#d3e4fd] flex flex-col justify-center items-center px-6 py-24 md:py-32">
       <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg px-8 py-16 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+        <h1 className="text-4xl md:text-5xl font-semibold text-primary mb-4">
           Welcome to AI Tutor Pro
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto">
@@ -18,7 +18,7 @@ const Home = () => {
         </p>
         <Button
           className="px-8 py-3 text-lg"
-          onClick={() => navigate("/ocr")}
+          onClick={() => navigate("/")}
           variant="default"
         >
           Get Started
