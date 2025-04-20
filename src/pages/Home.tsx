@@ -18,7 +18,7 @@ const Home = () => {
         </p>
         <Button
           className="px-8 py-3 text-lg"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/ocr")}
           variant="default"
         >
           Get Started
@@ -32,3 +32,4 @@ const Home = () => {
 };
 
 export default Home;
+
