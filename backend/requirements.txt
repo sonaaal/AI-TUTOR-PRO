@@ -1,0 +1,35 @@
+# Core FastAPI
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# Math Solving
+sympy>=1.12
+
+# OCR (Tesseract Wrapper)
+# You need to install Tesseract OCR separately: https://tesseract-ocr.github.io/tessdoc/Installation.html
+pytesseract>=0.3.10
+Pillow>=10.0.0 # Image manipulation, dependency for pytesseract
+python-multipart>=0.0.9 # For file uploads
+
+# Image Processing (for enhancing OCR)
+opencv-python-headless>=4.8.0 # Use headless version for servers
+
+# PDF Handling (if using Tesseract with PDFs)
+# Requires poppler library: https://github.com/oschwartz10612/poppler-windows/releases/ or via package manager (brew install poppler / sudo apt-get install poppler-utils)
+pdf2image>=1.17.0
+
+# Text-to-Speech (Optional)
+gTTS>=2.5.1
+
+# CORS - Handled by fastapi package itself
+
+# Google Generative AI (for Gemini OCR)
+google-generativeai>=0.4.0
+
+# Optional Integrations (Uncomment and configure in .env if used)
+# openai>=1.14.0
+# wolframalpha>=5.0.0
+# requests>=2.31.0 # For Mathpix API 

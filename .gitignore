@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backend specific ignores
+backend/uploads/
+backend/.env
+backend/__pycache__/
+backend/*.log
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/venv/
+backend/.venv/

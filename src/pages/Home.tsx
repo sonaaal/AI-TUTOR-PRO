@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -16,13 +15,22 @@ const Home = () => {
           Upload handwritten or printed math questions, get instant OCR extraction, live editing, and step-by-step solutions.
           Learn smarter with AI-powered tutoring right at your fingertips.
         </p>
-        <Button
-          className="px-8 py-3 text-lg"
-          onClick={() => navigate("/")}
-          variant="default"
-        >
-          Get Started
-        </Button>
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <Button
+            className="px-8 py-3 text-lg w-full sm:w-auto"
+            onClick={() => navigate("/ocr")}
+            variant="default"
+          >
+            Solve & Diagnose Problems
+          </Button>
+          <Button
+            className="px-8 py-3 text-lg w-full sm:w-auto"
+            onClick={() => navigate("/tutor")}
+            variant="outline"
+          >
+            AI Tutor
+          </Button>
+        </div>
       </div>
       <footer className="mt-16 text-muted-foreground text-sm">
         © {new Date().getFullYear()} AI Tutor Pro - Educational use only. Credits: OpenAI, SymPy.
