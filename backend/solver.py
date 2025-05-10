@@ -328,3 +328,104 @@ Provide only the feedback to the student.
              raise HTTPException(status_code=401, detail="AI API Error: Invalid API Key or Authentication Failed.")
         else:
             raise HTTPException(status_code=500, detail=f"Failed to diagnose mistake using AI model: {str(e)}") 
+
+async def generate_daily_math_puzzle() -> Dict[str, Any]:
+    """Generates a daily math puzzle using the Gemini API.
+
+    Returns:
+        A dictionary containing "question", "answer", and "difficulty",
+        or raises HTTPException on error.
+    """
+    logger.info("Attempting to generate a daily math puzzle using Gemini...")
+
+    if not genai:
+        logger.error("Gemini API client not configured or key is missing for daily puzzle generation.")
+        raise HTTPException(status_code=501,
+                            detail="Daily puzzle generation via AI model is not configured.")
+
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+
+        prompt = """You are a creative puzzle generator.
+Generate a unique and engaging math puzzle suitable for a general audience.
+The puzzle should be solvable with logic and basic math skills, not overly complex or involving very advanced topics unless specified.
+Provide the following three pieces of information:
+1.  "question": The puzzle question itself (string).
+2.  "answer": The final numerical or short text answer (string or number).
+3.  "difficulty": A difficulty rating for the puzzle (string: 'easy', 'medium', or 'hard').
+
+Format the output STRICTLY as a single JSON object with keys "question", "answer", and "difficulty".
+Example:
+{
+  "question": "If a hen and a half lay an egg and a half in a day and a half, how many eggs do six hens lay in six days?",
+  "answer": "24",
+  "difficulty": "medium"
+}
+
+Do not include any other text, explanations, or markdown formatting outside of this JSON object.
+"""
+
+        logger.info(f"Sending daily puzzle generation request to Gemini model: {model.model_name}")
+        response = await model.generate_content_async(prompt)
+
+        if response and hasattr(response, 'text'):
+            raw_response_text = response.text.strip()
+            logger.info(f"Received response from Gemini for daily puzzle. Length: {len(raw_response_text)}")
+            logger.debug(f"Gemini Raw Daily Puzzle Response:\\n{raw_response_text}")
+
+            try:
+                # Attempt to parse the JSON response
+                import json # Import json here as it's only used in this part
+                payload_match = re.search(r'```json\\n({.*?})\\n```', raw_response_text, re.DOTALL)
+                if payload_match:
+                    json_text = payload_match.group(1)
+                else:
+                    # Fallback: assume the whole response is JSON if no markdown triple quotes
+                    json_text = raw_response_text
+                
+                puzzle_data = json.loads(json_text)
+
+                if not all(k in puzzle_data for k in ["question", "answer", "difficulty"]):
+                    logger.error(f"Gemini response for daily puzzle missing required keys. Got: {puzzle_data.keys()}")
+                    raise HTTPException(status_code=500, detail="AI returned malformed data for the daily puzzle (missing keys).")
+                
+                # Basic validation of types
+                if not isinstance(puzzle_data["question"], str) or \
+                   not isinstance(puzzle_data["answer"], (str, int, float)) or \
+                   not isinstance(puzzle_data["difficulty"], str) or \
+                   puzzle_data["difficulty"].lower() not in ['easy', 'medium', 'hard']:
+                    logger.error(f"Gemini response for daily puzzle has invalid data types or difficulty. Data: {puzzle_data}")
+                    raise HTTPException(status_code=500, detail="AI returned malformed data for the daily puzzle (invalid types/difficulty).")
+
+                logger.info("Successfully parsed daily puzzle data from Gemini.")
+                return {
+                    "question": str(puzzle_data["question"]),
+                    "answer": str(puzzle_data["answer"]), # Ensure answer is string
+                    "difficulty": str(puzzle_data["difficulty"]).lower()
+                }
+
+            except json.JSONDecodeError as jde:
+                logger.error(f"Failed to decode JSON from Gemini daily puzzle response: {jde}. Response was: {raw_response_text}")
+                raise HTTPException(status_code=500, detail=f"AI returned invalid JSON for the daily puzzle. {str(jde)}")
+            except Exception as e: # Catch other parsing errors
+                logger.error(f"Error processing Gemini daily puzzle response: {e}. Response was: {raw_response_text}")
+                raise HTTPException(status_code=500, detail=f"Error processing AI response for daily puzzle. {str(e)}")
+
+
+        elif response and hasattr(response, 'prompt_feedback') and response.prompt_feedback.block_reason:
+            block_reason = response.prompt_feedback.block_reason
+            logger.error(f"Gemini request blocked for daily puzzle generation. Reason: {block_reason}")
+            raise HTTPException(status_code=400, detail=f"Content generation for daily puzzle blocked by API. Reason: {block_reason}")
+        else:
+            logger.error(f"Gemini response format unexpected or empty for daily puzzle generation. Response: {response}")
+            raise HTTPException(status_code=500, detail="AI returned an unexpected or empty response for daily puzzle generation.")
+
+    except HTTPException as http_exc: # Re-raise HTTPExceptions directly
+        raise http_exc
+    except Exception as e:
+        logger.error(f"Gemini daily puzzle generation failed: {e}", exc_info=True)
+        err_str = str(e).lower()
+        if "api key" in err_str or "permission denied" in err_str or "authentication" in err_str:
+             raise HTTPException(status_code=401, detail="AI API Error for daily puzzle: Invalid API Key or Authentication Failed.")
+        else:
+            raise HTTPException(status_code=500, detail=f"Failed to generate daily puzzle using AI model: {str(e)}") 
