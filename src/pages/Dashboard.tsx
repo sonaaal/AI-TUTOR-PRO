@@ -74,7 +74,7 @@ const DashboardPage: React.FC = () => {
   const [isDailyChallengeLoading, setIsDailyChallengeLoading] = useState<boolean>(false);
   const [dailyChallengeError, setDailyChallengeError] = useState<string | null>(null);
   const [isDailyChallengeSubmitting, setIsDailyChallengeSubmitting] = useState<boolean>(false);
-
+  
   // Mock data for statistics - replace with actual API calls in production
   const [stats, setStats] = useState({
     problemsSolved: 24,
@@ -513,7 +513,7 @@ const DashboardPage: React.FC = () => {
               {!isDailyChallengeLoading && dailyChallengeError && dailyChallengeQuestion && !dailyChallengeFeedback && (
                  <div className="mt-4 text-center py-2 text-red-600">
                   <p>Error submitting: {dailyChallengeError}</p>
-                </div>
+          </div>
               )}
             </CardContent>
           </Card>

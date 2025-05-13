@@ -16,7 +16,7 @@ Math Wiz Assistant is a comprehensive web application designed to help users sol
     *   **Step-by-Step Solutions**: Get detailed, sequential explanations for solving math problems.
     *   **Final Answers**: Clear presentation of the solution for math problems.
     *   **Interactive Explanations**: Ask "why" or "how" for specific math steps to get further clarification.
-*   **Mistake Diagnosis (Mathematics)**: Input a math problem and your attempted solution to receive AI-driven feedback on errors.
+*   **Mistake Diagnosis (Mathematics)**: Input a math problem and your attempted solution to to receive AI-driven feedback on errors.
 *   **Practice Problem Generation (Mathematics)**:
     *   Generate math practice questions based on a selected topic or a previously solved problem.
 *   **Computer Science Learning Module**:

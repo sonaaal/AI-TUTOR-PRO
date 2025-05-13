@@ -11,6 +11,8 @@ import { useAuth } from '@/context/AuthContext'; // Import useAuth
 import CodingProblemDisplay from './cs/CodingProblemDisplay'; // Import the new component
 import McqQuestionDisplay from './cs/McqQuestionDisplay'; // Import the new MCQ component
 import TheoryQuestionDisplay from './cs/TheoryQuestionDisplay'; // Import the new Theory component
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 
 // --- Configuration ---
 // Standardize to use VITE_API_URL and default to the correct backend port 8000
@@ -1011,12 +1013,12 @@ const TutorComponent: React.FC = () => {
   // --- Graphing Handler ---
   const handleGenerateGraph = async () => {
     if (!graphEquation.trim()) {
-        toast({ title: "No Equation", description: "Please enter an equation to graph.", variant: "destructive" });
+        setGraphError("Please enter an equation.");
         return;
     }
     setIsLoadingGraph(true);
-    setGraphImageDataUrl(null);
     setGraphError(null);
+    setGraphImageDataUrl(null);
 
     try {
         const response = await fetch(`${API_BASE_URL}/generate-graph`, {
@@ -1615,6 +1617,138 @@ const TutorComponent: React.FC = () => {
               )}
             </div>
           )}
+
+          {/* New Card for Graph Generation - Redesigned */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-6">
+              <h2 className="text-xl font-semibold text-white mb-2">Interactive Equation Grapher</h2>
+              <p className="text-purple-100 text-sm">Visualize mathematical equations and functions</p>
+        </div>
+            <div className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <Label htmlFor="equationInput" className="text-gray-700 font-medium">Enter Your Equation</Label>
+                  <div className="mt-2 flex gap-2">
+                    <Input
+                      id="equationInput"
+                      type="text"
+                      value={graphEquation}
+                      onChange={(e) => setGraphEquation(e.target.value)}
+                      placeholder="e.g., y = x^2 - 2*x + 1"
+                      disabled={isLoadingGraph}
+                      className="flex-grow border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                    />
+                    <Button 
+                      onClick={handleGenerateGraph} 
+                      disabled={isLoadingGraph}
+                      className="bg-indigo-600 hover:bg-indigo-700"
+                    >
+                      {isLoadingGraph ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Plotting...
+                        </>
+                      ) : (
+                        "Generate Graph"
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {/* Quick Example Equations */}
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-500 mb-2">Try an example:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-xs bg-gray-50 hover:bg-gray-100 border-gray-200"
+                        onClick={() => setGraphEquation("y = x^2")}
+                        disabled={isLoadingGraph}
+                      >
+                        y = x²
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-xs bg-gray-50 hover:bg-gray-100 border-gray-200"
+                        onClick={() => setGraphEquation("y = sin(x)")}
+                        disabled={isLoadingGraph}
+                      >
+                        y = sin(x)
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-xs bg-gray-50 hover:bg-gray-100 border-gray-200"
+                        onClick={() => setGraphEquation("y = x^3 - 3*x")}
+                        disabled={isLoadingGraph}
+                      >
+                        y = x³ - 3x
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-xs bg-gray-50 hover:bg-gray-100 border-gray-200"
+                        onClick={() => setGraphEquation("y = cos(x) + sin(2*x)")}
+                        disabled={isLoadingGraph}
+                      >
+                        y = cos(x) + sin(2x)
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-2 text-xs text-gray-500">
+                    <p>Supported: Basic operations, trigonometric functions, polynomials, exponents</p>
+                  </div>
+                </div>
+                
+                {graphError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm font-medium text-red-600 flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {graphError}
+                    </p>
+                  </div>
+                )}
+                
+                {graphImageDataUrl && (
+                  <div className="bg-white rounded-xl shadow-md p-4 border border-indigo-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <p className="font-medium text-indigo-800">Graph of: {graphEquation}</p>
+                    </div>
+                    <div className="flex justify-center bg-indigo-50 rounded-lg p-4">
+                      <img
+                        src={graphImageDataUrl}
+                        alt={`Graph of ${graphEquation}`}
+                        className="max-w-full h-auto rounded-md shadow-sm"
+                      />
+                    </div>
+                    <div className="mt-4 text-center">
+                      <a 
+                        href={graphImageDataUrl} 
+                        download={`graph-${graphEquation.replace(/[^a-zA-Z0-9]/g, '_')}.png`}
+                        className="text-sm text-indigo-600 hover:text-indigo-800"
+                      >
+                        Download Graph Image
+                      </a>
+                    </div>
+                  </div>
+                )}
+                
+                {!graphImageDataUrl && !graphError && !isLoadingGraph && (
+                  <div className="bg-indigo-50 rounded-xl p-8 text-center border border-indigo-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-indigo-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4v16h16V4H4z" />
+                    </svg>
+                    <p className="text-indigo-700 font-medium">Enter an equation to generate a graph</p>
+                    <p className="text-indigo-500 text-sm mt-1">Visualize functions and mathematical expressions</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
